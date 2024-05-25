@@ -2,7 +2,7 @@
 This is an adaptation of the pipeline for streamspot to consume our 5G CamFlow dataset
 
 ## Environment Settings
-Follow the description in the [environment settings](../../DARPA/settings/environment-settings.md) to set up the required environment for Kairos.
+Follow the description in the [environment settings](../DARPA/settings/environment-settings.md) to set up the required environment for Kairos.
 
 ## Create the database
 Use the following commands to create the database for the StreamSpot dataset
@@ -12,26 +12,27 @@ Use the following commands to create the database for the StreamSpot dataset
 sudo -u postgres psql
 
 # create the database
-postgres=# create database 5gcamflow;
+postgres=# create database camflow;
 
 # switch to the created database
-postgres=# \connect 5gcamflow;
+postgres=# \connect camflow;
 
 # create the table and grant the privileges to postgres
-5gcamflow=# create table IF NOT EXISTS raw_data
+camflow=# create table IF NOT EXISTS raw_data
 (
     source_id        varchar,
     source_type      varchar,
     destination_id   varchar,
     destination_type varchar,
     edge_type        varchar,
+    logical_ts       integer,
     graph_id         integer,
     _id              serial
         constraint raw_data_pk
             primary key
 );
 
-5gcamflow=# alter table raw_data owner to postgres;
+camflow=# alter table raw_data owner to postgres;
 ```
 
 ## Running StreamSpot experiments

@@ -29,13 +29,30 @@ cur = connect.cursor()
 # Rollback when there exists any problem
 connect.rollback()
 
+
+node_types = set()
+edge_types = set()
 if process_raw_data:
+    fidx = 0
     path = "/the/absolute/path/of/raw_log"  # The paths to the dataset.
     datalist = []
     with open(path) as f:
         for line in tqdm(f):
-            spl = line.strip().split('\t')
+            src_id, dest_id, types = line.strip('\n').split(' ')
+            src_type, dest_type, edge_type, ts = types.split(":")
+            spl = [
+                src_id,
+                src_type,
+                dest_id,
+                dest_type,
+                edge_type,
+                ts,
+                fidx,
+                ]
             datalist.append(spl)
+            node_types.add(src_type)
+            node_types.add(dest_type)
+            edge_types.add(edge_type)
             if len(datalist) >= 10000:
                 sql = '''insert into raw_data
                  values %s
@@ -44,75 +61,13 @@ if process_raw_data:
                 connect.commit()
                 datalist = []
 
-node_type = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}
-edge_type = {'A',
-             'B',
-             'C',
-             'D',
-             'E',
-             'F',
-             'G',
-             'H',
-             'i',
-             'j',
-             'k',
-             'l',
-             'm',
-             'n',
-             'o',
-             'p',
-             'q',
-             'r',
-             's',
-             't',
-             'u',
-             'v',
-             'w',
-             'x',
-             'y',
-             'z'}
-maps = {'process': 'a',
-        'thread': 'b',
-        'file': 'c',
-        'MAP_ANONYMOUS': 'd',
-        'NA': 'e',
-        'stdin': 'f',
-        'stdout': 'g',
-        'stderr': 'h',
-        'accept': 'i',
-        'access': 'j',
-        'bind': 'k',
-        'chmod': 'l',
-        'clone': 'm',
-        'close': 'n',
-        'connect': 'o',
-        'execve': 'p',
-        'fstat': 'q',
-        'ftruncate': 'r',
-        'listen': 's',
-        'mmap2': 't',
-        'open': 'u',
-        'read': 'v',
-        'recv': 'w',
-        'recvfrom': 'x',
-        'recvmsg': 'y',
-        'send': 'z',
-        'sendmsg': 'A',
-        'sendto': 'B',
-        'stat': 'C',
-        'truncate': 'D',
-        'unlink': 'E',
-        'waitpid': 'F',
-        'write': 'G',
-        'writev': 'H',
-        }
-nodevec = torch.nn.functional.one_hot(torch.arange(0, len(node_type)), num_classes=len(node_type))
-edgevec = torch.nn.functional.one_hot(torch.arange(0, len(edge_type)), num_classes=len(edge_type))
+nodevec = torch.nn.functional.one_hot(torch.arange(0, len(node_types)), num_classes=len(node_types))
+edgevec = torch.nn.functional.one_hot(torch.arange(0, len(edge_types)), num_classes=len(edge_types))
 
 edge2onehot = {}
 node2onehot = {}
 c = 0
-for i in node_type:
+for i in node_types:
     node2onehot[i] = nodevec[c]
     c += 1
 c = 0

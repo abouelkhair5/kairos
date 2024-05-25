@@ -12,8 +12,7 @@ from torch_geometric.datasets import JODIEDataset
 from torch_geometric.datasets import ICEWS18
 # from torch_geometric.loader import TemporalDataLoader
 from torch_geometric.nn import TGNMemory, TransformerConv
-from torch_geometric.nn.models.tgn import (LastNeighborLoader, IdentityMessage,
-                                           LastAggregator)
+from torch_geometric.nn.models.tgn import (LastNeighborLoader, IdentityMessage, LastAggregator)
 from torch_geometric import *
 from torch_geometric.utils import negative_sampling
 from tqdm import tqdm
@@ -23,8 +22,8 @@ import math
 import copy
 import re
 import time
-# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device='cpu'
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# device='cpu'
 # msg structure:      [src_node_feature,edge_attr,dst_node_feature]
 train_data=torch.load("../data/graph_0.TemporalData")
 train_data2=torch.load("../data/graph_100.TemporalData")
